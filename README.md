@@ -503,19 +503,3 @@ if prediction >= 0.5:  # Change to 0.6 for higher precision
 | **Total** | **34,459** | **17,677** | **16,782** |
 
 ---
-
-## License
-
-MIT License - See LICENSE file for details
-
----
-
-## Contact
-
-For questions or issues:
-- Open an issue on GitHub
-- Email: your.email@example.com
-
----
-
-**Last Updated:** December 2024
