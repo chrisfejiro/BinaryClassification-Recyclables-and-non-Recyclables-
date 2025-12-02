@@ -299,13 +299,6 @@ Confusion Matrix:
 
 AUC-ROC: 0.9960
 ```
-
-### Inference Speed
-
-- **GPU**: ~8ms per image
-- **CPU**: ~43ms per image
-- **Mobile (TFLite)**: ~95ms per image
-
 ---
 
 ## Troubleshooting
