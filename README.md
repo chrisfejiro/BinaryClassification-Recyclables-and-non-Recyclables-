@@ -33,12 +33,7 @@ python predict.py
 ### Setup
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/waste-classification.git
-cd waste-classification
-
-# Create virtual environment (recommended)
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+git clone https://github.com/chrisfejiro/BinaryClassification-Recyclables-and-non-Recyclables-.git
 
 # Install dependencies
 pip install -r requirements.txt
@@ -46,7 +41,6 @@ pip install -r requirements.txt
 # Verify installation
 python -c "import tensorflow as tf; print('TensorFlow:', tf.__version__)"
 ```
-
 ---
 ## Dataset Preparation
 *Note=The total images used when running the code locally was 34,459.Due to this large upload when pushing to Github ,Github truncated the directory to 1000 files each for both Recyclables and Non-Recyclables. 
@@ -206,7 +200,7 @@ waste-classification/
 │   └── Non-Recyclables/
 │
 ├── models/                     # Trained models
-│   ├── best_model.h5          ⭐ Use this for predictions
+│   ├── best_model.h5          Use this for predictions
 │   ├── final_model.h5
 │   └── model_phase1.h5
 │
