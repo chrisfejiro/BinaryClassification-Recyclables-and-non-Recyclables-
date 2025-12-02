@@ -49,7 +49,7 @@ python -c "import tensorflow as tf; print('TensorFlow:', tf.__version__)"
 
 ---
 ## Dataset Preparation
-
+*Note=The total images used when running the code locally was 34,459.Due to this large upload when pushing to Github ,Github truncated the directory to 1000 files each for both Recyclables and Non-Recyclables. 
 ### Directory Structure
 
 Place your original dataset in this structure:
