@@ -1,6 +1,22 @@
 """
-predict.py — Batch prediction for images in 'input_images' folder
+predict.py – Batch prediction for images in 'input_images' folder
 Automatically detects images and predicts recyclable vs non-recyclable.
+
+Usage:
+    python predict.py
+
+The script will:
+    1. Load the trained model from models/best_model.h5
+    2. Process all images in the input_images/ folder
+    3. Display predictions with confidence scores
+    4. Show each image with its classification result
+
+Confidence Interpretation:
+    - >90%: Very high confidence (model is very certain)
+    - 75-90%: High confidence (reliable prediction)
+    - 60-75%: Moderate confidence (generally accurate)
+    - <60%: Low confidence (consider manual verification)
+    
 """
 
 import os

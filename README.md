@@ -2,9 +2,10 @@
 
 Binary image classification system for recyclable vs non-recyclable waste using MobileNetV2 transfer learning.
 
-**Test Accuracy: 97.31% | AUC-ROC: 0.9960 | Inference: <50ms**
----
+## **Test Accuracy: 97.31% | AUC-ROC: 0.9960 | Inference: <50ms**
+
 ## Quick Start
+
 ```bash
 # Install dependencies
 pip install -r requirements.txt
@@ -26,11 +27,13 @@ python predict.py
 ## Installation
 
 ### Prerequisites
+
 - Python 3.8+
 - 8GB RAM minimum
 - Optional: NVIDIA GPU for faster training
 
 ### Setup
+
 ```bash
 # Clone repository
 git clone https://github.com/chrisfejiro/BinaryClassification-Recyclables-and-non-Recyclables-.git
@@ -41,12 +44,17 @@ pip install -r requirements.txt
 # Verify installation
 python -c "import tensorflow as tf; print('TensorFlow:', tf.__version__)"
 ```
+
 ---
+
 ## Dataset Preparation
-*Note=The total images used when running the code locally was 34,459.Due to this large upload when pushing to Github ,Github truncated the directory to 1000 files each for both Recyclables and Non-Recyclables. 
+
+\*Note=The total images used when running the code locally was 34,459.Due to this large upload when pushing to Github ,Github truncated the directory to 1000 files each for both Recyclables and Non-Recyclables.
+
 ### Directory Structure
 
 Place your original dataset in this structure:
+
 ```
 DatasetFinal/
 ├── Recyclables/        # 17,677 images
@@ -54,11 +62,13 @@ DatasetFinal/
 ```
 
 ### Split Dataset
+
 ```bash
 python scripts/split_dataset.py
 ```
 
 **Output:**
+
 ```
 data/
 ├── train/      # 24,134 images (70%)
@@ -67,6 +77,7 @@ data/
 ```
 
 **Configuration:**
+
 - Edit `scripts/split_dataset.py` to change split ratios
 - Default: 70% train, 15% validation, 15% test
 - Stratified splitting maintains class balance
@@ -76,18 +87,21 @@ data/
 ## Training
 
 ### Basic Training
+
 ```bash
 cd src
 python train_and_evaluate.py
 ```
 
 **Training Time:**
+
 - GPU (RTX 3070): ~1.5 hours
 - CPU: ~3-5 hours
 
 ### Training Configuration
 
 Edit `src/train_and_evaluate.py` to modify:
+
 ```python
 # Architecture
 INPUT_SHAPE = (224, 224, 3)
@@ -108,16 +122,19 @@ UNFREEZE_LAYERS = 30
 ### Training Process
 
 **Phase 1: Feature Extraction (Epochs 1-10)**
+
 - Freezes MobileNetV2 base
 - Trains only classification head
 - Learning rate: 0.001
 
 **Phase 2: Fine-Tuning (Epochs 11-30)**
+
 - Unfreezes last 30 layers
 - Fine-tunes entire model
 - Learning rate: 0.0001
 
 ### Output Files
+
 ```
 models/
 ├── model_phase1.h5     # Phase 1 checkpoint
@@ -136,11 +153,13 @@ results/
 ## Prediction
 
 ### Single Image
+
 ```bash
 python predict.py
 ```
 
 Enter image path when prompted:
+
 ```
 Enter path to waste item image: input_images/test.jpg
 ```
@@ -148,6 +167,7 @@ Enter path to waste item image: input_images/test.jpg
 ### Batch Prediction
 
 Place images in `input_images/` folder:
+
 ```bash
 mkdir input_images
 cp path/to/images/*.jpg input_images/
@@ -157,6 +177,7 @@ python predict.py
 The script automatically processes all images in the folder.
 
 ### Python API
+
 ```python
 import numpy as np
 from tensorflow.keras.models import load_model
@@ -186,7 +207,63 @@ print(f"{label}: {confidence:.2f}%")
 
 ---
 
+## Understanding Model Output
+
+### Confidence Score Interpretation
+
+When the model makes a prediction, it outputs a confidence score between 0 and 1:
+
+| Confidence Range                   | Interpretation | Recommendation                                      |
+| ---------------------------------- | -------------- | --------------------------------------------------- |
+| **0.90 - 1.00** or **0.00 - 0.10** | Very High      | Model is very certain - trust the prediction        |
+| **0.75 - 0.90** or **0.10 - 0.25** | High           | Reliable prediction - generally accurate            |
+| **0.60 - 0.75** or **0.25 - 0.40** | Moderate       | Reasonable confidence - usually correct             |
+| **0.40 - 0.60**                    | Low            | Uncertain prediction - consider manual verification |
+
+**Example:**
+
+```
+Image: plastic_bottle.jpg
+Prediction: RECYCLABLE
+Raw score: 0.9873
+Confidence: 98.73% → Very High
+```
+
+### What the Numbers Mean
+
+- **Scores close to 1.0**: Model thinks it's recyclable
+- **Scores close to 0.0**: Model thinks it's non-recyclable
+- **Scores near 0.5**: Model is unsure (check manually)
+
+### Common Prediction Patterns
+
+**High Confidence Recyclables:**
+
+- Clear plastic bottles
+- Aluminum cans
+- Clean cardboard boxes
+- Glass bottles
+
+**High Confidence Non-Recyclables:**
+
+- Food waste
+- Contaminated packaging
+- Mixed materials
+- Textiles
+
+**Low Confidence Cases (Manual Check Recommended):**
+
+- Items with unclear material composition
+- Partially visible objects
+- Poor lighting conditions
+- Dirty or damaged items
+
+---
+
+---
+
 ## Code Structure
+
 ```
 waste-classification/
 │
@@ -225,6 +302,7 @@ waste-classification/
 ---
 
 ## Model Architecture
+
 ```
 Input (224×224×3)
     ↓
@@ -242,6 +320,7 @@ Output (0-1 probability)
 ```
 
 **Model Details:**
+
 - Base: MobileNetV2 pre-trained on ImageNet
 - Custom layers: 164,097 parameters
 - Total parameters: 2,423,105
@@ -253,6 +332,7 @@ Output (0-1 probability)
 ## Data Augmentation
 
 **Training set only:**
+
 ```python
 ImageDataGenerator(
     rescale=1./255,
@@ -267,6 +347,7 @@ ImageDataGenerator(
 ```
 
 **Validation/Test sets:**
+
 - Only rescaling (1./255)
 - No augmentation
 
@@ -274,17 +355,17 @@ ImageDataGenerator(
 
 ## Hyperparameters
 
-| Parameter | Value | Description |
-|-----------|-------|-------------|
-| `INPUT_SHAPE` | (224, 224, 3) | Input image dimensions |
-| `BATCH_SIZE` | 32 | Images per batch |
-| `DENSE_UNITS` | 128 | Dense layer neurons |
-| `DROPOUT_RATE` | 0.5 | Dropout probability |
-| `LEARNING_RATE_PHASE1` | 0.001 | Initial learning rate |
-| `LEARNING_RATE_PHASE2` | 0.0001 | Fine-tuning learning rate |
-| `EPOCHS_PHASE1` | 10 | Feature extraction epochs |
-| `EPOCHS_PHASE2` | 20 | Fine-tuning epochs |
-| `UNFREEZE_LAYERS` | 30 | Layers to fine-tune |
+| Parameter              | Value         | Description               |
+| ---------------------- | ------------- | ------------------------- |
+| `INPUT_SHAPE`          | (224, 224, 3) | Input image dimensions    |
+| `BATCH_SIZE`           | 32            | Images per batch          |
+| `DENSE_UNITS`          | 128           | Dense layer neurons       |
+| `DROPOUT_RATE`         | 0.5           | Dropout probability       |
+| `LEARNING_RATE_PHASE1` | 0.001         | Initial learning rate     |
+| `LEARNING_RATE_PHASE2` | 0.0001        | Fine-tuning learning rate |
+| `EPOCHS_PHASE1`        | 10            | Feature extraction epochs |
+| `EPOCHS_PHASE2`        | 20            | Fine-tuning epochs        |
+| `UNFREEZE_LAYERS`      | 30            | Layers to fine-tune       |
 
 To modify, edit the hyperparameters section in `src/train_and_evaluate.py`.
 
@@ -293,6 +374,7 @@ To modify, edit the hyperparameters section in `src/train_and_evaluate.py`.
 ## Performance
 
 ### Test Results
+
 ```
 Accuracy: 97.31%
 
@@ -321,24 +403,28 @@ AUC-ROC: 0.9960
 ### Common Issues
 
 **Error: `DatasetFinal not found`**
+
 ```bash
 # Ensure folder exists in project root
 ls DatasetFinal
 ```
 
 **Error: `Out of memory`**
+
 ```python
 # In src/train_and_evaluate.py, reduce batch size:
 BATCH_SIZE = 16  # or 8
 ```
 
 **Error: `Module not found`**
+
 ```bash
 # Reinstall dependencies
 pip install -r requirements.txt --force-reinstall
 ```
 
 **Training is slow**
+
 ```bash
 # Check GPU availability
 python -c "import tensorflow as tf; print('GPU:', tf.config.list_physical_devices('GPU'))"
@@ -347,6 +433,7 @@ python -c "import tensorflow as tf; print('GPU:', tf.config.list_physical_device
 ```
 
 **Low accuracy after training**
+
 - Check dataset quality (corrupted images)
 - Verify data split worked correctly
 - Ensure sufficient training time (don't interrupt)
@@ -355,6 +442,7 @@ python -c "import tensorflow as tf; print('GPU:', tf.config.list_physical_device
 ---
 
 ## Requirements
+
 ```txt
 tensorflow==2.14.0
 numpy==1.24.3
@@ -365,6 +453,7 @@ Pillow==10.0.0
 ```
 
 **System Requirements:**
+
 - Python 3.8+
 - 8GB RAM minimum (16GB recommended)
 - 20GB storage minimum
@@ -379,11 +468,13 @@ Pillow==10.0.0
 **Purpose:** Split original dataset into train/val/test
 
 **Usage:**
+
 ```bash
 python scripts/split_dataset.py
 ```
 
 **Configuration:**
+
 ```python
 split_dataset(
     source_dir='DatasetFinal',
@@ -402,12 +493,14 @@ split_dataset(
 **Purpose:** Train model and evaluate performance
 
 **Usage:**
+
 ```bash
 cd src
 python train_and_evaluate.py
 ```
 
 **What it does:**
+
 1. Loads and augments training data
 2. Builds MobileNetV2 model
 3. Trains Phase 1 (feature extraction)
@@ -417,6 +510,7 @@ python train_and_evaluate.py
 7. Saves models and results
 
 **Output:**
+
 - `models/best_model.h5`
 - `results/*.png`
 
@@ -427,17 +521,20 @@ python train_and_evaluate.py
 **Purpose:** Make predictions on new images
 
 **Usage:**
+
 ```bash
 python predict.py
 ```
 
 **What it does:**
+
 1. Loads trained model
 2. Scans `input_images/` folder
 3. Predicts each image
 4. Displays results with confidence
 
 **Example output:**
+
 ```
 plastic_bottle.jpg: RECYCLABLE (0.9873)
 food_waste.jpg: NON-RECYCLABLE (0.9624)
@@ -446,11 +543,41 @@ aluminum_can.jpg: RECYCLABLE (0.9912)
 
 ---
 
+## Project Contributors
+
+### Team Members
+
+**Ayenor Oghenefejiro Christopher** & **Oluwateniola Ajetomobi**
+
+**Collaborative Contributions:**
+
+- Dataset collection, preparation, and splitting
+- Project design and methodology development
+- Comprehensive 30-page research report
+- Model architecture selection and justification
+- Results analysis and interpretation
+
+**Code Development:**
+
+- Model training pipeline (Ayenor - lead)
+- Documentation and usage guidelines (Oluwateniola - lead)
+
+### Acknowledgments
+
+- **Dataset Sources:** Custom images and open-source waste classification datasets
+- **Framework:** TensorFlow/Keras with MobileNetV2 pre-trained model
+- **Inspiration:** Addressing the global waste management crisis through AI
+
+---
+
+---
+
 ## Customization
 
 ### Change Model Architecture
 
 Edit `src/train_and_evaluate.py`:
+
 ```python
 # Change dense layer size
 DENSE_UNITS = 256  # Default: 128
@@ -465,6 +592,7 @@ UNFREEZE_LAYERS = 50  # Default: 30
 ### Modify Data Augmentation
 
 Edit `src/train_and_evaluate.py`:
+
 ```python
 train_datagen = ImageDataGenerator(
     rescale=1./255,
@@ -479,6 +607,7 @@ train_datagen = ImageDataGenerator(
 ### Change Classification Threshold
 
 Edit `predict.py`:
+
 ```python
 # Default threshold: 0.5
 if prediction >= 0.5:  # Change to 0.6 for higher precision
@@ -489,11 +618,11 @@ if prediction >= 0.5:  # Change to 0.6 for higher precision
 
 ## Dataset Statistics
 
-| Split | Total | Recyclable | Non-Recyclable |
-|-------|-------|------------|----------------|
-| Train | 24,134 | 12,374 (51.3%) | 11,747 (48.7%) |
-| Val | 5,156 | 2,652 (51.4%) | 2,517 (48.8%) |
-| Test | 5,169 | 2,651 (51.3%) | 2,518 (48.7%) |
-| **Total** | **34,459** | **17,677** | **16,782** |
+| Split     | Total      | Recyclable     | Non-Recyclable |
+| --------- | ---------- | -------------- | -------------- |
+| Train     | 24,134     | 12,374 (51.3%) | 11,747 (48.7%) |
+| Val       | 5,156      | 2,652 (51.4%)  | 2,517 (48.8%)  |
+| Test      | 5,169      | 2,651 (51.3%)  | 2,518 (48.7%)  |
+| **Total** | **34,459** | **17,677**     | **16,782**     |
 
 ---

@@ -1,8 +1,8 @@
 """
-Binary Classification: Recyclable vs Non-Recyclable
-Using MobileNetV2 with Transfer Learning
+Waste Classification Training Script
+Uses MobileNetV2 with transfer learning for binary classification
 """
-
+# Core libraries
 import os
 import sys
 import numpy as np
@@ -51,19 +51,19 @@ print("Binary Classification: Recyclable vs Non-Recyclable")
 print("="*70)
 
 # Architecture
-INPUT_SHAPE = (224, 224, 3)
-DENSE_UNITS = 128
-DROPOUT_RATE = 0.5
+INPUT_SHAPE = (224, 224, 3)     # Standard MobileNetV2 input size
+DENSE_UNITS = 128               # Size of classification layer
+DROPOUT_RATE = 0.5              # Dropout to prevent overfitting
 
-# Training Phase 1 (Feature Extraction)
-BATCH_SIZE = 32
-EPOCHS_PHASE1 = 10
-LEARNING_RATE_PHASE1 = 0.001
+# Training Phase 1 (Feature Extraction with frozen base)
+BATCH_SIZE = 32                 # Number of images processed together
+EPOCHS_PHASE1 = 10              # Quick training of classification head
+LEARNING_RATE_PHASE1 = 0.001    # Higher LR for training new layers
 
-# Training Phase 2 (Fine-tuning)
-EPOCHS_PHASE2 = 20
-LEARNING_RATE_PHASE2 = 0.0001
-UNFREEZE_LAYERS = 30
+# Training Phase 2 (Fine-tuning with unfrozen layers)
+EPOCHS_PHASE2 = 20              # More epochs for fine-tuning
+LEARNING_RATE_PHASE2 = 0.0001   # Lower LR to preserve pretrained weights
+UNFREEZE_LAYERS = 30            # Number of top layers to unfreeze
 
 print("\nHyperparameters:")
 print(f"  Input Shape: {INPUT_SHAPE}")
@@ -194,6 +194,10 @@ print(f"  Total parameters: {total_params:,}")
 print(f"  Trainable parameters: {trainable_params:,}")
 print(f"  Non-trainable parameters: {total_params - trainable_params:,}")
 
+# Model Architecture Notes:
+# MobileNetV2 base provides efficient feature extraction (~2.2M params)
+# Custom head has only ~164K trainable params (keeps model lightweight)
+# This architecture enables deployment on edge devices like Raspberry Pi
 #==============================================================================
 # PHASE 1: FEATURE EXTRACTION
 #==============================================================================
@@ -238,6 +242,10 @@ history_phase1 = model.fit(
 
 print("\nPhase 1 completed!")
 
+# Phase 1 Training Complete:
+# - Classification head has learned to distinguish recyclable vs non-recyclable
+# - Base model weights remain frozen (preserved ImageNet features)
+# - Model is now ready for Phase 2 fine-tuning
 #==============================================================================
 # PHASE 2: FINE-TUNING
 #==============================================================================
